@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 import list as lt 
 from random import randint
 
