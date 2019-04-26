@@ -31,6 +31,8 @@ class Novice_Village(object):
             return 'doom_mate'
 
     def doom_mate(self):
+        if self.gender in lt.gender_female:
+            lt.dfdoommates['性别']="女"
         print("这是你的四个室友：\n")
         parter=lt.dfdoommates
         print(parter)
@@ -47,7 +49,7 @@ class Novice_Village(object):
             print("看好了，这是你的新室友，不能再换了。")
             print(lt.dfdoommates)
             r=randint(0,len(lt.abj)-1)
-            print(f"OK，准备开始你{lt.abj[r]}的大学生活吧！")
+            print(f"OK，准备开始你{lt.abj[r]}大学生活吧！")
             return 'doom_live'
         elif change_mate == "否":
             r=randint(0,len(lt.abj)-1)
@@ -58,6 +60,44 @@ class Novice_Village(object):
             return 'doom_mate'
 
     def doom_live(self):
+        print("你找到了你的宿舍，此时，其他几个室友已经就位了......")
+        if "张龙" not in lt.dfdoommates.姓名.values:
+            print('赵虎走上来根你说："你居然敢把我兄弟换走，看我不揍死你！"')
+            fight()
+        elif "赵虎" not in lt.dfdoommates.姓名.values:
+            print('张龙走上来根你说："你居然敢把我兄弟换走，看我不揍死你！"')
+            fight()
+        elif "王朝" not in lt.dfdoommates.姓名.values:
+            print('马汉走上来根你说："你居然敢把我兄弟换走，看我不揍死你！"')
+            fight()
+        elif "马汉" not in lt.dfdoommates.姓名.values:
+            print('王朝走上来根你说："你居然敢把我兄弟换走，看我不揍死你！"')
+            fight()
+        else:
+            print('但是王朝马汉，张龙赵虎互相之间都已经很熟悉了。并没有人来搭理你。')
+            exit(1)
+
+
+def fight():
+    decision=input('要不要干他娘的一炮呢？')
+    if decision in lt.positive:
+        print(f"你也不甘示弱，并使出了一招{lt.kongfu[randint(0,len(lt.kongfu)-1)]}")
+        win=randint(0,1)
+        if win == 0:
+            print("你把人打死啦！！！")
+            print("你被警察带走了，大学生涯从此结束......")
+            exit(1)
+        else:
+            print("不会功夫还装什么装！你被人打死啦！！！")
+            print("你被殡仪馆带走了，大学生涯从此结束......")
+            exit(1)
+    elif decision in lt.negitive:
+        print("他们觉得你太怂了，还是揍了你。\n哎呀！你被人打死啦！！！")
+        print("你被殡仪馆带走了，大学生涯从此结束......")
         exit(1)
+    else:
+        print("没人听得懂你的胡言乱语，大家觉得你是个怪胎，就放过你了。")
+        exit(1)
+
 #test=Novice_Village()
 #test.doom_mate()

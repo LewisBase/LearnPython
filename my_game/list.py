@@ -4,8 +4,11 @@ import pandas as pd
 from random import randint
 
 abj=["狗屎般的","幸运的","苦逼的","辛苦的","自由的","一路挂科的","光辉灿烂的","无上荣光的"]
+positive=["是","要","没错","干","yes","OK","no problem","好","没问题"]
+negitive=["no","never","不是","不要","否","不行","不好"]
 gender_male=np.array(["男","公","雄","male","boy","man","son"])
 gender_female=np.array(["女","母","雌","female","girl","woman","madam"])
+kongfu=["上勾拳","扫膛腿","降龙十八章","黑虎掏心","巴拉拉小魔仙"]
 
 # information of doom mates
 
