@@ -11,29 +11,46 @@ import pandas as pd
 import dfATOM
 
 class Atom(object):
-    def __init__(self,X=0.0,Y=0.0,Z=0.0,M=0.0,Name='Null'):
+    def __init__(self,X=0.0,Y=0.0,Z=0.0,Name='Null'):
         '''Define a new atom with coordinate, atom mass
         and atom name'''
         self.x = X
         self.y = Y
         self.z = Z
-        self.mass = M
         self.AtomName = Name
 
 class Molecule(object):
+    # Main Construct
     def __init__(self,X=[],Y=[],Z=[],atomsname=[],Name='Null'):
         '''Define a new molecule from a series of coordinate
         , atomsname and molecule name'''
+        if not(len(X) == len(Y) and len(X) == len(Z) and len(X) == len(atomsname)):
+            raise Exception('The elements in x, y, z and atomsname must be equal!')
         self.AtomNumber = len(X)
         self.x = X
         self.y = Y
         self.z = Z
         self.MoleculeName = Name
         self.AtomsName = atomsname
-
         self.MoleculeMass = 0.0
         for name in self.AtomsName:
             self.MoleculeMass += dfATOM.dfAtoms.loc['mass',name]
+
+    # Minor Construct
+    @classmethod
+    def MoleculeFromAtom(cls,Atoms,Name='Null'):
+        '''Define a new molecule from a series of atoms'''
+        X=[]
+        Y=[]
+        Z=[]
+        atomsname=[]
+        MoleculeName=Name
+        for atom in Atoms:
+            X.append(atom.x)
+            Y.append(atom.y)
+            Z.append(atom.z)
+            atomsname.append(atom.AtomName)
+        return cls(X,Y,Z,atomsname,MoleculeName)
 
     
     def MassCenter(self):
