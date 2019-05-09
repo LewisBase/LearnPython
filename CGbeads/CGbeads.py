@@ -7,6 +7,8 @@
 import math
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 import dfATOM
 
@@ -93,6 +95,34 @@ class Molecule(object):
         distance_z=abs(firstz-secondz)
         distance = math.sqrt((distance_x)**2+(distance_y)**2+(distance_z)**2)
         return distance,distance_x,distance_y,distance_z
+    
+    def ShowMolecule(self):
+        '''Show molecule in a 3D scatter figure'''
+        fig=plt.figure()
+        ax=Axes3D(fig)
+        for num in range(self.AtomNumber):
+            if num % 2 == 0:
+                ScatterColor = 'r'
+            else:
+                ScatterColor = 'b'
+            ax.scatter(xs=self.x[num],ys=self.y[num],zs=self.z[num], \
+                s=4500*dfATOM.dfAtoms.loc['sigma',self.AtomsName[num]], \
+                c=ScatterColor)
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        plt.show()
+    
+    def PrintMolecule(self):
+        '''Print the name and cordinate information of molecule'''
+        print('NO. AtomName sig(nm) eps(kJ/mol) X(nm) Y(nm) Z(nm)')
+        for num in range(self.AtomNumber):
+            print('%d\t%s\t%2.2f\t%2.2f\t%2.2f\t%2.2f\t%2.2f' \
+                %(num+1,self.AtomsName[num], \
+                dfATOM.dfAtoms.loc['sigma',self.AtomsName[num]], \
+                dfATOM.dfAtoms.loc['epsilon',self.AtomsName[num]], \
+                self.x[num],self.y[num],self.z[num]))
+
 
 
 def main():

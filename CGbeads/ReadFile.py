@@ -28,7 +28,7 @@ def ReadItpFile(filename):
             atomindex=np.append(atomindex,TotalMessage[num].split()[0])
             atomnames=np.append(atomnames,TotalMessage[num].split()[1])
         else:
-            print('None element in list!')
+            print('Attention! A blank line at the end was detected and will be ignored')
             break
     return atomnames
 
