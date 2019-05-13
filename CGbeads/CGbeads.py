@@ -13,13 +13,34 @@ from mpl_toolkits.mplot3d import Axes3D
 import dfATOM
 
 class Atom(object):
-    def __init__(self,X=0.0,Y=0.0,Z=0.0,Name='Null'):
-        '''Define a new atom with coordinate, atom mass
+    def __init__(self,X=0.0,Y=0.0,Z=0.0,S=0.0,E=0.0,C=0.0,M=0.0,Name='Null'):
+        '''Define a new atom with coordinate, LJ, charge, atom mass
         and atom name'''
         self.x = X
         self.y = Y
         self.z = Z
+        self.sig = S
+        self.eps = E
+        self.cha = C
+        self.mass = M
         self.AtomName = Name
+
+    def MoveAtom(self,*args):
+        '''Move the atom along the vector input, 3 floats 
+        or a 1-d vector with 3 element are allowed to input.'''
+        if len(args) == 3:
+            xm,ym,zm = args
+            self.x += xm
+            self.y += ym
+            self.z += zm
+        elif len(args) == 1:
+            xm,ym,zm = args[0][0],args[0][1],args[0][2]
+            self.x += xm
+            self.y += ym
+            self.z += zm
+        else:
+            raise Exception('The input parameter must be a 3-d vector or 3 floats!')
+
 
 class Molecule(object):
     # Main Construct
@@ -70,12 +91,21 @@ class Molecule(object):
         CenterZ /= self.MoleculeMass
         return CenterX,CenterY,CenterZ
 
-    def MoveMolecule(self,movex=0.0,movey=0.0,movez=0.0):
+    def MoveMolecule(self,*args):
         '''Move the molecule along a vector.
         Change the original coordiante.'''
-        self.x += movex
-        self.y += movey
-        self.z += movez
+        if len(args) == 3:
+            xm,ym,zm = args
+            self.x += xm
+            self.y += ym
+            self.z += zm
+        elif len(args) == 1:
+            xm,ym,zm = args[0][0],args[0][1],args[0][2]
+            self.x += xm
+            self.y += ym
+            self.z += zm
+        else:
+            raise Exception('The input parameter must be a 3-d vector or 3 floats!')
     
     def MaxLength(self):
         '''Calculate the max length in x, y, z dimension.

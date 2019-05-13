@@ -14,5 +14,8 @@ index,x,y,z=ReadFile.ReadGroFile('em-va.gro')
 atomsname=ReadFile.ReadItpFile('Protein_A.itp')
 
 SP_B=CGbeads.Molecule(x,y,z,atomsname,'SP-B')
+SP_B.PrintMolecule()
+TargetLocation=[3.5,3.5,3.5]
+SP_B.MoveMolecule(TargetLocation[0]-SP_B.MassCenter()[0],TargetLocation[1]-SP_B.MassCenter()[1],TargetLocation[2]-SP_B.MassCenter()[2])
 SP_B.ShowMolecule()
 SP_B.PrintMolecule()
