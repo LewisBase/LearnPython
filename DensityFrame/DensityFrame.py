@@ -5,12 +5,13 @@
 # Start Date: 2019.05.24
 # Version: 1.0.0
 # Finish Date: 2019.05.25
+# Update: Amplify the high contrast box 
 
 import numpy as np 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
-from scipy.interpolate import interp1d
-from scipy.integrate import quad
+#from scipy.interpolate import interp1d
+#from scipy.integrate import quad
 
 def TransformData(X,Y,DENSITY):
     '''This function is used to transform the x and y to
@@ -96,10 +97,27 @@ class DensityFrame(object):
         index,column = self.hcd.shape
         for i in range(index):
             for j in range(column):
-                if self.hcd[i][j] < 2E-2:
+                if self.hcd[i][j] < 1.4E-2:
                     self.hcd[i][j] = 0
                 else:
                     self.hcd[i][j] = 1
+    #    # amplify the box
+    #    global amp 
+    #    amp = 4
+    #    self.hcd = np.zeros([amp*index,amp*column])
+    #    for i in range(amp*index):
+    #        for j in range(amp*column):
+    #            if originhcd[i//amp][j//amp] == 1:
+    #                self.hcd[i][j] = 1
+    #    hcx = np.zeros([amp*len(np.unique(self.x))])
+    #    for num in range(len(np.unique(self.x))):
+    #        for i in range(amp):
+    #            hcx[amp*num+i] = np.unique(self.x)[num]+i*(self.x[0][1]-self.x[0][0])
+    #    hcy = np.zeros([amp*len(np.unique(self.y))])
+    #    for num in range(len(np.unique(self.y))):
+    #        for i in range(amp):
+    #            hcy[amp*num+i] = np.unique(self.y)[num]+i*(self.y[1][0]-self.y[0][0])
+    #    self.hcx,self.hcy = np.meshgrid(hcx,hcy)
 
     def DensMap(self,bar='bar',savepicture='no'):
         '''Draw a colormap of density profile.
@@ -165,20 +183,35 @@ class DensityFrame(object):
                                             self.hcd[down] == 0 or \
                                             self.hcd[right] == 0 or \
                                             self.hcd[left]  == 0):
-                    fity = np.append(fity,j*0.5)
-                    fitx = np.append(fitx,i*0.5)
+                    fity = np.append(fity,j*0.49)
+                    fitx = np.append(fitx,i*0.49)
+                    #print(fity, fitx)
         fitxnew = np.unique(fitx)
         fitynew = np.array([])
         for element in fitxnew:
             fitynew = np.append(fitynew, \
-                fity[int(np.argwhere(fitx == element)[0])])
-        curve = interp1d(fitxnew,fitynew,kind='cubic')
-        xfinal = np.linspace(fitxnew.min(),fitxnew.max(),1000,endpoint=True)
-        yfinal = curve(xfinal)
+                fity[int(np.min(np.argwhere(fitx == element)))])
+        # 
+        fitxsplit = fitxnew[::int(len(fitxnew)/10)]
+        fitysplit = fitynew[::int(len(fitynew)/10)]
+        if fitxsplit[-1] != fitxnew[-1]:
+            fitxsplit = np.append(fitxsplit,fitxnew[-1])
+            fitysplit = np.append(fitysplit,fitynew[-1])
+        # 多项式拟合
+        fitz = np.polyfit(fitxsplit,fitysplit,5)
+        xfinal = np.linspace(fitxsplit.min(),fitxsplit.max(),1000,endpoint=True)
+        fitfunction = np.poly1d(fitz)
+        #print(fitfunction)
+        yfinal = fitfunction(xfinal)
+        #curve = interp1d(fitxsplit,fitysplit,kind='cubic')
+        #xfinal = np.linspace(fitxsplit.min(),fitxsplit.max(),1000,endpoint=True)
+        #yfinal = curve(xfinal)
         plt.scatter(fitx,fity,c='r')
-        plt.scatter(fitxnew,fitynew,c='b')
+        plt.scatter(fitxsplit,fitysplit,c='b')
         plt.plot(xfinal,yfinal)
         plt.show()
+        #xfinal = fitxnew
+        #yfinal = fitynew
         TotalSurfaceArea = Surface(xfinal,yfinal)
         return 2*TotalSurfaceArea
 
