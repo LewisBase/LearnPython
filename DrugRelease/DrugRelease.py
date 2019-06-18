@@ -31,9 +31,9 @@ def Higuchi_fit(K):
 
 def Hixson_Crowell_sq(p):
     k = p
-    return 100**(1/3)-y**(1/3)-k*x
+    return 0**(1/3)-y**(1/3)-k*x
 def Hixson_Crowell_fit(K):
-    return (100**(1/3)-K*x)**3
+    return (0**(1/3)-K*x)**3
 
 def Korsmeyer_sq(p):
     n = p
@@ -103,7 +103,7 @@ def FitFunction(function):
     else:
         raise Exception('No useful function found!')
         
-x,y = np.loadtxt('Drug.txt',delimiter='\t',usecols=(0,3),unpack=True)
+x,y = np.loadtxt('Drug.txt',delimiter='\t',usecols=(0,5),unpack=True)
 dfYvalue = pd.DataFrame(y,columns=['experiment'])
 plt.figure(figsize=(12,12),dpi=100)
 plt.scatter(x,y)
