@@ -17,6 +17,19 @@ def CalculateR_2(y1,y2):
     Sy1y2 = np.sum((y1-np.mean(y1))*(y2-np.mean(y2)))
     return (Sy1y2/np.sqrt(Sy1*Sy2))**2
 
+def AverageDate(filename):
+    filename1 = filename+'-1.txt'
+    filename2 = filename+'-2.txt'
+    filename3 = filename+'-3.txt'
+    x1,y1 = np.loadtxt(filename1,usecols=(0,1),unpack=True)
+    x2,y2 = np.loadtxt(filename2,usecols=(0,1),unpack=True)
+    x3,y3 = np.loadtxt(filename3,usecols=(0,1),unpack=True)
+    x = (x1+x2+x3)/3
+    y = (y1+y2+y3)/3
+    return x,y
+
+figcolumn = 2
+
 if len(argv) < 2:
     print('No Action specified.')
     exit()
@@ -38,8 +51,10 @@ elif len(argv) == 2:
             --version: Prints the version information
             --help:    Prints the help information
             Usage:
-            python Raman.py Totaldata.txt Splitdata1.txt Splitdata2.txt
-            There should have 2 or 3 splitdatas.''')
+            python Raman.py Totaldata SplitdataA SplitdataB ...
+            For average the data, each series of data files should be
+            named as xxx-1.txt, xxx-2.txt, xxx-3.txt
+            There should have 2, 3 or 4 splitdatas.''')
             exit()
         else:
             print('Unknow option!')
@@ -48,27 +63,37 @@ elif len(argv) == 2:
         print('a --option or some filenames are needed!')
 elif len(argv) == 4:
     def RamanCombine(p):
-        a,aa,b0,b1,b2,b3,b4,b5 = p
-        return y-(a)*x1-(aa)*x2-b0-b1*xw-b2*xw**2-b3*xw**3-b4*xw**4-b5*xw**5
+        a1,a2,b0,b1,b2,b3,b4,b5 = p
+        return y-np.abs(a1)*x1-np.abs(a2)*x2-b0-b1*xw-b2*xw**2-b3*xw**3-b4*xw**4-b5*xw**5
 
-    def RamanFit(A,AA,B0,B1,B2,B3,B4,B5):
-        return (A)*x1+(AA)*x2+B0+B1*xw+B2*xw**2+B3*xw**3+B4*xw**4+B5*xw**5
+    def RamanFit(A1,A2,B0,B1,B2,B3,B4,B5):
+        return np.abs(A1)*x1+np.abs(A2)*x2+B0+B1*xw+B2*xw**2+B3*xw**3+B4*xw**4+B5*xw**5
     script,fileS,fileA,fileB = argv
 elif len(argv) == 5:
     def RamanCombine(p):
-        a,aa,aaa,b0,b1,b2,b3,b4,b5 = p
-        return y-(a)*x1-(aa)*x2-(aaa)*x3-b0-b1*xw-b2*xw**2-b3*xw**3-b4*xw**4-b5*xw**5
+        a1,a2,a3,b0,b1,b2,b3,b4,b5 = p
+        return y-np.abs(a1)*x1-np.abs(a2)*x2-np.abs(a3)*x3-b0-b1*xw-b2*xw**2-b3*xw**3-b4*xw**4-b5*xw**5
 
-    def RamanFit(A,AA,AAA,B0,B1,B2,B3,B4,B5):
-        return (A)*x1+(AA)*x2+(AAA)*x3+B0+B1*xw+B2*xw**2+B3*xw**3+B4*xw**4+B5*xw**5
+    def RamanFit(A1,A2,A3,B0,B1,B2,B3,B4,B5):
+        return np.abs(A1)*x1+np.abs(A2)*x2+np.abs(A3)*x3+B0+B1*xw+B2*xw**2+B3*xw**3+B4*xw**4+B5*xw**5
     script,fileS,fileA,fileB,fileC = argv
+elif len(argv) == 6:
+    figcolumn = 3
+    def RamanCombine(p):
+        a1,a2,a3,a4,b0,b1,b2,b3,b4,b5 = p
+        return y-np.abs(a1)*x1-np.abs(a2)*x2-np.abs(a3)*x3-np.abs(a4)*x4-b0-b1*xw-b2*xw**2-b3*xw**3-b4*xw**4-b5*xw**5
+
+    def RamanFit(A1,A2,A3,A4,B0,B1,B2,B3,B4,B5):
+        return np.abs(A1)*x1+np.abs(A2)*x2+np.abs(A3)*x3+np.abs(A4)*x4+B0+B1*xw+B2*xw**2+B3*xw**3+B4*xw**4+B5*xw**5
+    script,fileS,fileA,fileB,fileC,fileD = argv
 else:
     print('Too many parameters!')
     exit()
 
-xs,ys = np.loadtxt(fileS,dtype=float,usecols=(0,1),unpack=True)
-xa,ya = np.loadtxt(fileA,dtype=float,usecols=(0,1),unpack=True)
-xb,yb = np.loadtxt(fileB,dtype=float,usecols=(0,1),unpack=True)
+fileS = fileS+'.txt'
+xs,ys = np.loadtxt(fileS,usecols=(0,1),unpack=True)
+xa,ya = AverageDate(fileA)
+xb,yb = AverageDate(fileB)
 
 ys = (ys-ys.min())/(ys.max()-ys.min())
 ya = (ya-ya.min())/(ya.max()-ya.min())
@@ -82,22 +107,29 @@ fs = interpolate.interp1d(xs,ys)
 fa = interpolate.interp1d(xa,ya)
 fb = interpolate.interp1d(xb,yb)
 
-if 'fileC' in dir():
-    xc,yc = np.loadtxt(fileC,dtype=float,usecols=(0,1),unpack=True)
-    yc = (yc-yc.min())/(yc.max()-yc.min())
-    xc_new = np.linspace(xc.min(),xc.max(),1000)
-    fc = interpolate.interp1d(xc,yc)
-    x3 = fc(xc_new)
-    
 x1 = fa(xa_new)
 x2 = fb(xb_new)
 xw = xs_new
 y = fs(xs_new)
 
+if 'fileC' in dir():
+    xc,yc = AverageDate(fileC)
+    yc = (yc-yc.min())/(yc.max()-yc.min())
+    xc_new = np.linspace(xc.min(),xc.max(),1000)
+    fc = interpolate.interp1d(xc,yc)
+    x3 = fc(xc_new)
+if 'fileD' in dir():
+    xd,yd = AverageDate(fileD)
+    yd = (yd-yd.min())/(yd.max()-yd.min())
+    xd_new = np.linspace(xd.min(),xd.max(),1000)
+    fd = interpolate.interp1d(xd,yd)
+    x4 = fd(xd_new)
+    
+
 plt.figure(figsize=(12,12),dpi=100)
-ax1 = plt.subplot(2,2,1)
-ax2 = plt.subplot(2,2,2)
-ax3 = plt.subplot(2,2,3)
+ax1 = plt.subplot(2,figcolumn,1)
+ax2 = plt.subplot(2,figcolumn,2)
+ax3 = plt.subplot(2,figcolumn,3)
 plt.sca(ax1)
 plt.plot(xs,ys,'r-',xs_new,fs(xs_new),'b--')
 plt.legend(['dataS','dataS-interpolate'],loc='best',frameon=False,fontsize=15)
@@ -108,32 +140,71 @@ plt.sca(ax3)
 plt.plot(xb,yb,'r-',xb_new,fb(xb_new),'b--')
 plt.legend(['dataB','dataB-interpolate'],loc='best',frameon=False,fontsize=15)
 if 'fileC' in dir():
-    ax4 = plt.subplot(2,2,4)
+    ax4 = plt.subplot(2,figcolumn,4)
     plt.sca(ax4)
     plt.plot(xc,yc,'r-',xc_new,fc(xc_new),'b--')
     plt.legend(['dataC','dataC-interpolate'],loc='best',frameon=False,fontsize=15)
+    plt.xlabel(r'Wavenumber ($cm^{-1}$)',fontsize=15)
+    plt.ylabel('Intensity (a.u.)',fontsize=15)
+if 'fileD' in dir():
+    ax5 = plt.subplot(2,figcolumn,5)
+    plt.sca(ax5)
+    plt.plot(xd,yd,'r-',xd_new,fd(xc_new),'b--')
+    plt.legend(['dataD','dataD-interpolate'],loc='best',frameon=False,fontsize=15)
     plt.xlabel(r'Wavenumber ($cm^{-1}$)',fontsize=15)
     plt.ylabel('Intensity (a.u.)',fontsize=15)
 for name in [ax1,ax2,ax3]:
     plt.sca(name)
     plt.xlabel(r'Wavenumber ($cm^{-1}$)',fontsize=15)
     plt.ylabel('Intensity (a.u.)',fontsize=15)
+plt.tight_layout()
 plt.show()
 
-if 'fileC' in dir():
+if ('fileC' in dir()) and not ('fileD' in dir()):
     result = leastsq(RamanCombine,[1,1,1,1,1,1,1,1,1])
-    A,AA,AAA,B0,B1,B2,B3,B4,B5 = result[0]
-    yfit = RamanFit(A,AA,AAA,B0,B1,B2,B3,B4,B5)
-    print(f'A = {A}\nA\' = {AA}\nA\" = {AAA}\nB0 = {B0}\n\
-B1 = {B1}\nB2 = {B2}\nB3 = {B3}\nB4 = {B4}\n\
-B5 = {B5}\nR^2 = {CalculateR_2(y,yfit)}')
+    A1,A2,A3,B0,B1,B2,B3,B4,B5 = result[0]
+    yfit = RamanFit(A1,A2,A3,B0,B1,B2,B3,B4,B5)
+    print(f'''
+    A1 = {np.abs(A1)}
+    A2 = {np.abs(A2)}
+    A3 = {np.abs(A3)}
+    B0 = {B0}
+    B1 = {B1}
+    B2 = {B2}
+    B3 = {B3}
+    B4 = {B4}
+    B5 = {B5}
+    R^2 = {CalculateR_2(y,yfit)}''')
+elif ('fileC' in dir()) and ('fileD' in dir()):
+    result = leastsq(RamanCombine,[1,1,1,1,1,1,1,1,1,1])
+    A1,A2,A3,A4,B0,B1,B2,B3,B4,B5 = result[0]
+    yfit = RamanFit(A1,A2,A3,A4,B0,B1,B2,B3,B4,B5)
+    print(f'''
+    A1 = {np.abs(A1)}
+    A2 = {np.abs(A2)}
+    A3 = {np.abs(A3)}
+    A4 = {np.abs(A4)}
+    B0 = {B0}
+    B1 = {B1}
+    B2 = {B2}
+    B3 = {B3}
+    B4 = {B4}
+    B5 = {B5}
+    R^2 = {CalculateR_2(y,yfit)}''')
 else:
     result = leastsq(RamanCombine,[1,1,1,1,1,1,1,1])
-    A,AA,B0,B1,B2,B3,B4,B5 = result[0]
-    yfit = RamanFit(A,AA,B0,B1,B2,B3,B4,B5)
-    print(f'A = {A}\nA\' = {AA}\nB0 = {B0}\n\
-B1 = {B1}\nB2 = {B2}\nB3 = {B3}\nB4 = {B4}\n\
-B5 = {B5}\nR^2 = {CalculateR_2(y,yfit)}')
+    A1,A2,B0,B1,B2,B3,B4,B5 = result[0]
+    yfit = RamanFit(A1,A2,B0,B1,B2,B3,B4,B5)
+    print(f'''
+    A1 = {np.abs(A1)}
+    A2 = {np.abs(A2)}
+    B0 = {B0}
+    B1 = {B1}
+    B2 = {B2}
+    B3 = {B3}
+    B4 = {B4}
+    B5 = {B5}
+    R^2 = {CalculateR_2(y,yfit)}''')
 
 
 plt.figure(figsize=(12,12),dpi=100)
