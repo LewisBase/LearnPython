@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 from scipy.optimize import leastsq
 from scipy import interpolate
+from scipy.signal import savgol_filter
 from sys import argv,exit
 
 
@@ -107,23 +108,23 @@ fs = interpolate.interp1d(xs,ys)
 fa = interpolate.interp1d(xa,ya)
 fb = interpolate.interp1d(xb,yb)
 
-x1 = fa(xa_new)
-x2 = fb(xb_new)
+x1 = savgol_filter(tuple(fa(xa_new)),7,5)
+x2 = savgol_filter(tuple(fb(xb_new)),7,5)
 xw = xs_new
-y = fs(xs_new)
+y = savgol_filter(tuple(fs(xs_new)),7,5)
 
 if 'fileC' in dir():
     xc,yc = AverageDate(fileC)
     yc = (yc-yc.min())/(yc.max()-yc.min())
     xc_new = np.linspace(xc.min(),xc.max(),1000)
     fc = interpolate.interp1d(xc,yc)
-    x3 = fc(xc_new)
+    x3 = savgol_filter(tuple(fc(xc_new)),7,5)
 if 'fileD' in dir():
     xd,yd = AverageDate(fileD)
     yd = (yd-yd.min())/(yd.max()-yd.min())
     xd_new = np.linspace(xd.min(),xd.max(),1000)
     fd = interpolate.interp1d(xd,yd)
-    x4 = fd(xd_new)
+    x4 = savgol_filter(tuple(fd(xd_new)),7,5)
     
 
 plt.figure(figsize=(12,12),dpi=100)
