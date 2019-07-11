@@ -9,6 +9,7 @@ from scipy.optimize import leastsq
 from scipy import interpolate
 from scipy.signal import savgol_filter
 from sys import argv,exit
+import csv
 
 
 def CalculateR_2(y1,y2):
@@ -91,14 +92,20 @@ else:
     print('Too many parameters!')
     exit()
 
-fileS = fileS+'.txt'
+fileS += '.txt'
 xs,ys = np.loadtxt(fileS,usecols=(0,1),unpack=True)
 xa,ya = AverageDate(fileA)
-xb,yb = AverageDate(fileB)
+#xb,yb = AverageDate(fileB)
+fileB += '.txt'
+xb,yb = np.loadtxt(fileB,usecols=(0,1),unpack=True)
+
 
 ys = (ys-ys.min())/(ys.max()-ys.min())
 ya = (ya-ya.min())/(ya.max()-ya.min())
 yb = (yb-yb.min())/(yb.max()-yb.min())
+#ys = (ys-ys.mean())/np.sqrt(ys.std())
+#ya = (ya-ya.mean())/np.sqrt(ya.std())
+#yb = (yb-yb.mean())/np.sqrt(yb.std())
 
 xs_new = np.linspace(xs.min(),xs.max(),1000)
 xa_new = np.linspace(xa.min(),xa.max(),1000)
@@ -114,14 +121,20 @@ xw = xs_new
 y = savgol_filter(tuple(fs(xs_new)),7,5)
 
 if 'fileC' in dir():
-    xc,yc = AverageDate(fileC)
+    #xc,yc = AverageDate(fileC)
+    fileC += '.txt'
+    xc,yc = np.loadtxt(fileC,usecols=(0,1),unpack=True)
     yc = (yc-yc.min())/(yc.max()-yc.min())
+    #yc = (yc-yc.mean())/np.sqrt(yc.std())
     xc_new = np.linspace(xc.min(),xc.max(),1000)
     fc = interpolate.interp1d(xc,yc)
     x3 = savgol_filter(tuple(fc(xc_new)),7,5)
 if 'fileD' in dir():
-    xd,yd = AverageDate(fileD)
+    fileD += '.txt'
+    xd,yd = np.loadtxt(fileD,usecols=(0,1),unpack=True)
+    #xd,yd = AverageDate(fileD)
     yd = (yd-yd.min())/(yd.max()-yd.min())
+    #yd = (yd-yd.mean())/np.sqrt(yd.std())
     xd_new = np.linspace(xd.min(),xd.max(),1000)
     fd = interpolate.interp1d(xd,yd)
     x4 = savgol_filter(tuple(fd(xd_new)),7,5)
@@ -176,6 +189,8 @@ if ('fileC' in dir()) and not ('fileD' in dir()):
     B4 = {B4}
     B5 = {B5}
     R^2 = {CalculateR_2(y,yfit)}''')
+    with open('RamanAnalyse.txt','w') as fo:
+        fo.write(f'{np.abs(A1)}\n{np.abs(A2)}\n{np.abs(A3)}\n{CalculateR_2(y,yfit)}')
 elif ('fileC' in dir()) and ('fileD' in dir()):
     result = leastsq(RamanCombine,[1,1,1,1,1,1,1,1,1,1])
     A1,A2,A3,A4,B0,B1,B2,B3,B4,B5 = result[0]
@@ -192,6 +207,8 @@ elif ('fileC' in dir()) and ('fileD' in dir()):
     B4 = {B4}
     B5 = {B5}
     R^2 = {CalculateR_2(y,yfit)}''')
+    with open('RamanAnalyse.txt','w') as fo:
+        fo.write(f'{np.abs(A1)}\n{np.abs(A2)}\n{np.abs(A3)}\n{np.abs(A4)}\n{CalculateR_2(y,yfit)}')
 else:
     result = leastsq(RamanCombine,[1,1,1,1,1,1,1,1])
     A1,A2,B0,B1,B2,B3,B4,B5 = result[0]
@@ -206,6 +223,8 @@ else:
     B4 = {B4}
     B5 = {B5}
     R^2 = {CalculateR_2(y,yfit)}''')
+    with open('RamanAnalyse.txt','w') as fo:
+        fo.write(f'{np.abs(A1)}\n{np.abs(A2)}\n{CalculateR_2(y,yfit)}')
 
 
 plt.figure(figsize=(12,12),dpi=100)

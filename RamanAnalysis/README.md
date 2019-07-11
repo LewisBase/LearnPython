@@ -21,3 +21,7 @@
 例：
 
     python Raman.py 2sample-30min-6um1 2skin-0um yao 1-kongbairuye
+
+2019.07.08
+
+新增了一个批量处理数据的程序Autorun.py，实现了简单的手动输入文件名自动计算并制表的功能。
