@@ -3,10 +3,12 @@
 # create a colormap from data and calculate the surface area
 # Author: lewisbase
 # Start Date: 2019.05.24
-# Version: 1.0.0
+# Version: 1.0.1
 # Finish Date: 2019.05.25
 # Update: Amplify the high contrast box 
+# Update: Add argsparse
 
+import argparse
 import numpy as np 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -251,8 +253,24 @@ def Surface(X,Y):
     #print('TotalArea: ',TotalArea)
     return TotalArea
 
-if __name__ == 'main':
-    main()
+
+def get_parser():
+    parser = argparse.ArgumentParser(description='This script is used to create the density frame object \
+                                     and draw pictures')
+    parser.add_argument('filename',metavar='FILENAME',type=str,nargs=1,help='string, readin filename')
+    return parser
 
 def main():
-    pass
+    """
+    This will be called if the script is directly invoked
+    """
+    # adding command line argument
+    parser = get_parser()
+    args = vars(parser.parse_args())
+    # Set the varibles
+    filename = args['filename'][0]
+    test = ReadDensFile(filename)
+    print(test[1].SurfaceArea())
+
+if __name__ == '__main__':
+    main()
